@@ -1,7 +1,8 @@
 const express = require('express')
 const morgan = require('morgan')
-const app = express()
 const cors = require('cors')
+
+const app = express()
 app.use(express.static('dist'))
 app.use(cors())
 app.use(express.json())
@@ -35,9 +36,9 @@ let phonebookEntries =
     }
 ]
 
-app.get('/', (request, response) => {
-    response.send('<h1>Welcome!</h1>')
-})
+// app.get('/dist/index.html', (request, response) => {
+//     response.send('<h1>Welcome!</h1>')
+// })
   
 app.get('/api/persons', (request, response) => {
 response.json(phonebookEntries)
