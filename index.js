@@ -49,22 +49,22 @@ app.get('/api/persons', (request, response) => {
   })
 })
 
-app.get('/api/info', (request, response) => {
-    const options = {
-        weekday: 'long',
-        month: 'long',
-        day: 'numeric',
-        year: 'numeric',
-        hour: 'numeric',
-        minute: 'numeric',
-        second: 'numeric',
-        timeZoneName: 'long'
-    }
-    const formatter = new Intl.DateTimeFormat('en-us', options)
-    const formattedDate = formatter.format(new Date()) 
-    const message = `Phonebook has info for ${phonebookEntries.length} people`
-    response.send(`${message}<br>${formattedDate}`)
-})
+// app.get('/api/info', (request, response) => {
+//     const options = {
+//         weekday: 'long',
+//         month: 'long',
+//         day: 'numeric',
+//         year: 'numeric',
+//         hour: 'numeric',
+//         minute: 'numeric',
+//         second: 'numeric',
+//         timeZoneName: 'long'
+//     }
+//     const formatter = new Intl.DateTimeFormat('en-us', options)
+//     const formattedDate = formatter.format(new Date()) 
+//     const message = `Phonebook has info for ${phonebookEntries.length} people`
+//     response.send(`${message}<br>${formattedDate}`)
+// })
 
 
 app.get('/api/persons/:id', (request, response) => {
@@ -87,18 +87,18 @@ app.get('/api/persons/:id', (request, response) => {
 //     })
 // })
 
-app.delete('/api/persons/:id', (request, response) => {
-    const id = Number(request.params.id)
-    phonebookEntries = phonebookEntries.filter(person => person.id !== id)
-    response.status(204).end()
-})
+// app.delete('/api/persons/:id', (request, response) => {
+//     const id = Number(request.params.id)
+//     phonebookEntries = phonebookEntries.filter(person => person.id !== id)
+//     response.status(204).end()
+// })
 
-const generateId = () => {
-    const maxId = phonebookEntries.length > 0
-      ? Math.max(...phonebookEntries.map(n => n.id))
-      : 0
-    return maxId + 1
-  }
+// const generateId = () => {
+//     const maxId = phonebookEntries.length > 0
+//       ? Math.max(...phonebookEntries.map(n => n.id))
+//       : 0
+//     return maxId + 1
+//   }
   
 // app.post('/api/persons', (request, response) => {
 //   const body = request.body
@@ -136,8 +136,9 @@ app.post('/api/persons', (request, response) => {
     
     const person = {
         name: body.name,
-        number: body.number,
-        id: generateId(),
+        number: body.number
+        // ,
+        // id: Math.floor(Math.random() * 100),
     }
   
     person.save().then(savedPerson => {
