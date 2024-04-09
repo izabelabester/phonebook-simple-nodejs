@@ -2,9 +2,8 @@ require('dotenv').config()
 const express = require('express')
 const morgan = require('morgan')
 const cors = require('cors')
-const Person = require('./models/phonebook')
-
 const app = express()
+const Person = require('./models/person')
 app.use(express.static('dist'))
 app.use(cors())
 app.use(express.json())
@@ -13,40 +12,27 @@ morgan.token('body', req => {
     return JSON.stringify(req.body)
 })
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
+ 
+const requestLogger = (request, response, next) => {
+    console.log('Method:', request.method)
+    console.log('Path:  ', request.path)
+    console.log('Body:  ', request.body)
+    console.log('---')
+    next()
+  }
+app.use(requestLogger) 
 
-// let phonebookEntries = 
-// [
-//     { 
-//       "id": 1,
-//       "name": "Arto Hellas", 
-//       "number": "040-123456"
-//     },
-//     { 
-//       "id": 2,
-//       "name": "Ada Lovelace", 
-//       "number": "39-44-5323523"
-//     },
-//     { 
-//       "id": 3,
-//       "name": "Dan Abramov", 
-//       "number": "12-43-234345"
-//     },
-//     { 
-//       "id": 4,
-//       "name": "Mary Poppendieck", 
-//       "number": "39-23-6423122"
-//     }
-// ]
+const unknownEndpoint = (request, response) => {
+    response.status(404).send({ error: 'unknown endpoint' })
+}
 
-// app.get('/dist/index.html', (request, response) => {
-//     response.send('<h1>Welcome!</h1>')
-// })
-  
 app.get('/api/persons', (request, response) => {
+    console.log("app.get triggerred")
 // response.json(phonebookEntries)
     Person.find({}).then(persons => {
-    response.json(persons)
-  })
+        console.log("found persons: ", persons)
+        response.json(persons)
+    })
 })
 
 // app.get('/api/info', (request, response) => {
@@ -130,21 +116,20 @@ app.post('/api/persons', (request, response) => {
   
     if (!body.name || !body.number) {
         return response.status(400).json({ 
-        error: 'request is malformed' 
+            error: 'request is malformed' 
         })
     }
     
-    const person = {
+    const person = new Person({
         name: body.name,
-        number: body.number
-        // ,
-        // id: Math.floor(Math.random() * 100),
-    }
+        number: body.number,
+        id: Math.floor(Math.random() * 100)
+    })
   
     person.save().then(savedPerson => {
       response.json(savedPerson)
     })
-  })
+})
   
 const PORT = 3001
 app.listen(PORT, () => {
