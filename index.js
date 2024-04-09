@@ -25,13 +25,13 @@ const errorHandler = (error, request, response, next) => {
     console.error(error.message)
   
     if (error.name === 'CastError') {
-      return response.status(400).send({ error: 'malformatted id' })
-    } 
+        return response.status(400).send({ error: 'malformatted id' })
+    } else if (error.name === 'ValidationError') {
+        return response.status(400).send({ error: `${error.message}` })
+    }
   
     next(error)
 }
-
-app.use(errorHandler)
 
 const unknownEndpoint = (request, response) => {
     response.status(404).send({ error: 'unknown endpoint' })
@@ -45,7 +45,7 @@ app.get('/api/persons', (request, response, next) => {
     .catch(error => next(error))
 })
 
-app.get('/api/info', (request, response) => {
+app.get('/api/info', (request, response, next) => {
     const options = {
         weekday: 'long',
         month: 'long',
@@ -62,8 +62,8 @@ app.get('/api/info', (request, response) => {
     .then(persons => {
         const message = `Phonebook has info for ${persons.length} people`
         response.send(`${message}<br>${formattedDate}`)
-})
-.catch(error => next(error))  
+    })
+    .catch(error => next(error))  
 })
 
 app.get('/api/persons/:id', (request, response, next) => {
@@ -91,9 +91,7 @@ app.delete('/api/persons/:id', (request, response, next) => {
       .catch(error => next(error))
   })
 
-
-
-app.post('/api/persons', (request, response) => {
+app.post('/api/persons', (request, response, next) => {
     const body = request.body
   
     if (!body.name || !body.number) {
@@ -111,12 +109,13 @@ app.post('/api/persons', (request, response) => {
     person.save().then(savedPerson => {
       response.json(savedPerson)
     })
+    .catch(error => next(error))
 })
 
 app.put('/api/persons/:id', (request, response, next) => {
-    const body = request.body
+    const {name, number} = request.body
   
-    Person.findByIdAndUpdate(request.params.id, {name: body.name, number: body.number}, { new: true })
+    Person.findByIdAndUpdate(request.params.id, {name, number}, { new: true, runValidators: true, context: 'query' })
       .then(updatedPersonRecord => {
         response.json(updatedPersonRecord)
       })
@@ -124,6 +123,7 @@ app.put('/api/persons/:id', (request, response, next) => {
   })
 
 app.use(unknownEndpoint)
+app.use(errorHandler)
   
 const PORT = 3001
 app.listen(PORT, () => {
