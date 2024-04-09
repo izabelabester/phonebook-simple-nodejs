@@ -2,10 +2,23 @@ POST http://localhost:3001/api/persons/ HTTP/1.1
 content-type: application/json
 
 {
-    "name": "Some Name",
-    "number": "123-456-789"
+    "name": "Hello World 2",
+    "number": "123-456-7890"
 
 }
 
 ###
-GET http://localhost:3001/api/persons/1
+PUT http://localhost:3001/api/persons/66151e56be01b633541555ca HTTP/1.1
+content-type: application/json
+
+{
+    "name": "Hello World",
+    "number": "000-456-7890"
+
+}
+
+###
+GET http://localhost:3001/api/persons
+
+###
+GET http://localhost:3001/api/persons/66151d98be01b633541555c5
